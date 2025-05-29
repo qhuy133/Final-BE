@@ -1,6 +1,6 @@
-const QRCode = require('qrcode');
+const QRCode = require("qrcode");
 
-const generateQR = async text => {
+const generateQR = async (text) => {
   try {
     return await QRCode.toDataURL(text);
   } catch (err) {
@@ -9,3 +9,4 @@ const generateQR = async text => {
 };
 
 module.exports = generateQR;
+

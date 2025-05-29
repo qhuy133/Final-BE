@@ -1,11 +1,11 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const Showtime = require('../models/showtime');
+const express = require("express");
+const auth = require("../middlewares/auth");
+const Showtime = require("../models/showtime");
 
 const router = new express.Router();
 
 // Create a showtime
-router.post('/showtimes', auth.enhance, async (req, res) => {
+router.post("/showtimes", auth.enhance, async (req, res) => {
   const showtime = new Showtime(req.body);
   try {
     await showtime.save();
@@ -16,7 +16,7 @@ router.post('/showtimes', auth.enhance, async (req, res) => {
 });
 
 // Get all showtimes
-router.get('/showtimes', async (req, res) => {
+router.get("/showtimes", async (req, res) => {
   try {
     const showtimes = await Showtime.find({});
     res.send(showtimes);
@@ -26,7 +26,7 @@ router.get('/showtimes', async (req, res) => {
 });
 
 // Get showtime by id
-router.get('/showtimes/:id', async (req, res) => {
+router.get("/showtimes/:id", async (req, res) => {
   const _id = req.params.id;
   try {
     const showtime = await Showtime.findById(_id);
@@ -37,13 +37,22 @@ router.get('/showtimes/:id', async (req, res) => {
 });
 
 // Update showtime by id
-router.patch('/showtimes/:id', auth.enhance, async (req, res) => {
+router.patch("/showtimes/:id", auth.enhance, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['startAt', 'startDate', 'endDate', 'movieId', 'cinemaId'];
-  const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+  const allowedUpdates = [
+    "startAt",
+    "startDate",
+    "endDate",
+    "movieId",
+    "cinemaId",
+  ];
+  const isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
 
-  if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });
+  if (!isValidOperation)
+    return res.status(400).send({ error: "Invalid updates!" });
 
   try {
     const showtime = await Showtime.findById(_id);
@@ -56,7 +65,7 @@ router.patch('/showtimes/:id', auth.enhance, async (req, res) => {
 });
 
 // Delete showtime by id
-router.delete('/showtimes/:id', auth.enhance, async (req, res) => {
+router.delete("/showtimes/:id", auth.enhance, async (req, res) => {
   const _id = req.params.id;
   try {
     const showtime = await Showtime.findByIdAndDelete(_id);
@@ -67,3 +76,4 @@ router.delete('/showtimes/:id', auth.enhance, async (req, res) => {
 });
 
 module.exports = router;
+
