@@ -1,6 +1,6 @@
-const Reservation = require('../models/reservation');
-const Movie = require('../models/movie');
-const Cinema = require('../models/cinema');
+const Reservation = require("../models/reservation");
+const Movie = require("../models/movie");
+const Cinema = require("../models/cinema");
 
 // Cinema User modeling (GET ALL CINEMAS)
 // Get all cinemas based on the user's past reservations
@@ -10,9 +10,11 @@ const cinemaUserModeling = async (cinemas, username) => {
 
   if (userReservations.length) {
     let cinemaResult = {};
-    userReservations.map(userReservation => {
+    userReservations.map((userReservation) => {
       const id = userReservation.cinemaId;
-      cinemaResult.hasOwnProperty(id) ? ++cinemaResult[id] : (cinemaResult[id] = 1);
+      cinemaResult.hasOwnProperty(id)
+        ? ++cinemaResult[id]
+        : (cinemaResult[id] = 1);
     });
     const sortedCinemaResult = [];
     for (let cinema in cinemaResult) {
@@ -30,7 +32,7 @@ const cinemaUserModeling = async (cinemas, username) => {
     for (let sortedCinema of sortedCinemaResult) {
       newCinemas.forEach((cinema, index) => {
         if (cinema._id == sortedCinema[0]) {
-          console.log('FOUND');
+          console.log("FOUND");
           extractedObj = newCinemas.splice(index, 1);
         }
       });
@@ -46,7 +48,7 @@ const cinemaUserModeling = async (cinemas, username) => {
   }
 };
 
-const moviesUserModeling = async username => {
+const moviesUserModeling = async (username) => {
   const userPreference = {
     genre: {},
     director: {},
@@ -58,7 +60,7 @@ const moviesUserModeling = async username => {
   );
   const Allmovies = JSON.parse(JSON.stringify(await Movie.find({})));
 
-  const moviesWatched = userReservations.map(reservation => {
+  const moviesWatched = userReservations.map((reservation) => {
     for (let movie of Allmovies) {
       if (movie._id == reservation.movieId) {
         return movie;
@@ -68,10 +70,10 @@ const moviesUserModeling = async username => {
 
   //  console.log(moviesWatched);
 
-  moviesWatched.map(movie => {
-    let genres = movie.genre.replace(/\s*,\s*/g, ',').split(',');
-    let directors = movie.director.replace(/\s*,\s*/g, ',').split(',');
-    let casts = movie.cast.replace(/\s*,\s*/g, ',').split(',');
+  moviesWatched.map((movie) => {
+    let genres = movie.genre.replace(/\s*,\s*/g, ",").split(",");
+    let directors = movie.director.replace(/\s*,\s*/g, ",").split(",");
+    let casts = movie.cast.replace(/\s*,\s*/g, ",").split(",");
     for (let genre of genres) {
       userPreference.genre[genre]
         ? ++userPreference.genre[genre]
@@ -83,7 +85,9 @@ const moviesUserModeling = async username => {
         : (userPreference.director[director] = 1);
     }
     for (let cast of casts) {
-      userPreference.cast[cast] ? ++userPreference.cast[cast] : (userPreference.cast[cast] = 1);
+      userPreference.cast[cast]
+        ? ++userPreference.cast[cast]
+        : (userPreference.cast[cast] = 1);
     }
   });
 
@@ -92,7 +96,10 @@ const moviesUserModeling = async username => {
   //find movies that are available for booking
   const availableMovies = availableMoviesFilter(Allmovies);
   //console.log(availableMovies)
-  const moviesNotWatched = moviesNotWatchedFilter(availableMovies, userReservations);
+  const moviesNotWatched = moviesNotWatchedFilter(
+    availableMovies,
+    userReservations
+  );
   //console.log(moviesNotWatched)
 
   const moviesRated = findRates(moviesNotWatched, userPreference);
@@ -102,7 +109,7 @@ const moviesUserModeling = async username => {
   });
   // console.log(moviesRated)
 
-  const moviesToObject = moviesRated.map(array => {
+  const moviesToObject = moviesRated.map((array) => {
     return array[0];
   });
   return moviesToObject;
@@ -126,13 +133,13 @@ const findRates = (moviesNotWatched, userPreference) => {
 
 const getRateOfProperty = (pref, userPreference, movie) => {
   let rate = 0;
-  const values = Object.keys(userPreference[pref]).map(key => {
+  const values = Object.keys(userPreference[pref]).map((key) => {
     return [key, userPreference[pref][key]];
   });
-  let movieValues = movie[pref].replace(/\s*,\s*/g, ',').split(',');
+  let movieValues = movie[pref].replace(/\s*,\s*/g, ",").split(",");
   for (let value of values) {
     if (movieValues.length) {
-      for (let  movieValue of movieValues) {
+      for (let movieValue of movieValues) {
         if (movieValue == value[0]) {
           rate += value[1];
         }
@@ -143,10 +150,10 @@ const getRateOfProperty = (pref, userPreference, movie) => {
   return rate;
 };
 
-const availableMoviesFilter = Allmovies => {
+const availableMoviesFilter = (Allmovies) => {
   const today = new Date();
   const returnMovies = [];
-  Allmovies.map(movie => {
+  Allmovies.map((movie) => {
     let releaseDate = new Date(movie.releaseDate);
     let endDate = new Date(movie.endDate);
     if (today >= releaseDate && today <= endDate) {
@@ -158,7 +165,7 @@ const availableMoviesFilter = Allmovies => {
 
 const moviesNotWatchedFilter = (availableMovies, userReservations) => {
   const returnMovies = [];
-  availableMovies.map(movie => {
+  availableMovies.map((movie) => {
     let isFirst = [];
     for (let reservation of userReservations) {
       if (reservation.movieId == movie._id) {
@@ -188,7 +195,7 @@ const reservationSeatsUserModeling = async (username, newSeats) => {
     JSON.stringify(await Reservation.find({ username: username }))
   );
 
-  userReservations.map(reservation => {
+  userReservations.map((reservation) => {
     for (let cinema of cinemas) {
       if (cinema._id == reservation.cinemaId) {
         //find how many rows the cinema has
@@ -199,7 +206,8 @@ const reservationSeatsUserModeling = async (username, newSeats) => {
     }
   });
   numberOfTickets = Math.round(
-    numberOfTicketsArray.reduce((a, b) => a + b, 0) / numberOfTicketsArray.length
+    numberOfTicketsArray.reduce((a, b) => a + b, 0) /
+      numberOfTicketsArray.length
   );
 
   return {
@@ -216,11 +224,11 @@ const getPosition = (cinemaRows, seats) => {
     if (rowNum < i) {
       switch (pos) {
         case 1:
-          return 'front';
+          return "front";
         case 2:
-          return 'center';
+          return "center";
         case 3:
-          return 'back';
+          return "back";
       }
     }
     pos++;
@@ -234,3 +242,4 @@ const userModeling = {
 };
 
 module.exports = userModeling;
+

@@ -1,6 +1,6 @@
-const express = require('express');
-const auth = require('../middlewares/auth');
-const mail = require('../utils/mail');
+const express = require("express");
+const auth = require("../middlewares/auth");
+const mail = require("../utils/mail");
 
 const router = new express.Router();
 
@@ -19,15 +19,15 @@ const createMailOptions = (data) => {
                 <br/>
               `;
   return {
-    from: 'geosimos91@gmail.com',
+    from: "geosimos91@gmail.com",
     to,
-    subject: 'Cinema + Invitation',
+    subject: "Cinema + Invitation",
     html: htmlContent,
   };
 };
 
 // Send Invitation Emails
-router.post('/invitations', auth.simple, async (req, res) => {
+router.post("/invitations", auth.simple, async (req, res) => {
   const invitations = req.body;
   const promises = invitations.map((invitation) => {
     const mailOptions = createMailOptions(invitation);
@@ -43,3 +43,4 @@ router.post('/invitations', auth.simple, async (req, res) => {
   Promise.all(promises).then((result) => res.status(201).json(result));
 });
 module.exports = router;
+
